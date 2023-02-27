@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "pyblackjack"
+version = "0.1.0"
+description = "A simple game of Blackjack (No Theme Park or Luner Lander, sorry)"
+authors = ["Craig McLeod <mail@camcleod.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
