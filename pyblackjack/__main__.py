@@ -1,4 +1,5 @@
 import random
+from time import sleep
 
 
 def initialiseDeck(numDecks):
@@ -17,7 +18,8 @@ def drawCard():
     if len(gameState['cards']) == 0:
         print("You've run out of cards!")
         print("Game Over")
-        gameState['game_over'] = True
+        gameState['player_turn'] = False
+        gameState['cpu_turn'] = False
         return None
 
     # Crash Gard against drawing the last card in the deck
@@ -26,8 +28,6 @@ def drawCard():
     else:
         card_pnt = random.randint(0, len(gameState['cards']) - 1)
 
-    # print("Cards Left: " + str(len(gameState['cards'])))
-    # print("Index of Card Drawn: "+str(card_pnt))
     card = gameState['cards'][card_pnt]
     del gameState['cards'][card_pnt]
     return card
@@ -36,9 +36,10 @@ def drawCard():
 def initGameState():
     return {
         "player_score": 0,
-        "dealer_score": 0,
-        "dealer_mood": 0,
-        "game_over": False,
+        "cpu_score": 0,
+        "cpu_mood": 0,
+        "player_turn": True,
+        "cpu_turn": False,
         "cards": initialiseDeck(1)
     }
 
@@ -63,21 +64,70 @@ def playTurn():
         return None
 
     gameState['player_score'] += getValue(card.split()[0])
-    print("You Drew: "+card)
-    print("Your Score : "+str(gameState['player_score']))
+    print("You Drew: " + card)
     if gameState['player_score'] == 21:
-        print("BlackJack! You Win!")
-        gameState['game_over'] = True
-    if gameState['player_score'] > 21:
-        print("Bust! You Lose...")
-        gameState['game_over'] = True
+        print(str(gameState['player_score']) + "! BlackJack! You Win!")
+        gameState['player_turn'] = False
+        gameState['cpu_turn'] = False
+    elif gameState['player_score'] > 21:
+        print(str(gameState['player_score']) + "! Bust! You Lose!")
+        gameState['player_turn'] = False
+        gameState['cpu_turn'] = False
+    else:
+        answered = False
+        while not answered:
+            answer = input("Your Score is: " + str(gameState['player_score']) + ".\n(S)tick or (T)wist?\n")
+            if str.lower(answer) == 's':
+                print("You stick with a score of " + str(gameState['player_score']) + ".")
+                gameState['player_turn'] = False
+                gameState['cpu_turn'] = True
+                answered = True
+                continue
+            elif str.lower(answer) == 't':
+                print("Let's draw again!")
+                answered = True
+                continue
+            else:
+                print("Huh?")
     print()
     pass
 
 
+def cpuTurn():
+    card = drawCard()
+
+    # Safely End if no card is drawn
+    if card is None:
+        return None
+
+    gameState['cpu_score'] += getValue(card.split()[0])
+    print("The Dealer Drew: " + card)
+    print("The Dealer's Score : " + str(gameState['cpu_score']))
+    if gameState['cpu_score'] == 21:
+        print(str(gameState['cpu_score']) + "! BlackJack! The Dealer wins...")
+        gameState['cpu_turn'] = False
+    elif gameState['cpu_score'] > 21:
+        print(str(gameState['cpu_score']) + "! Bust! You Win!")
+        gameState['cpu_turn'] = False
+    else:
+        print(str(gameState['cpu_score']) + "! The Dealer's gonna draw again!")
+        sleep(2)
+    print()
+    pass
+
+
+def doThing():
+    pass
+
+
 if __name__ == '__main__':
+    running = True
     gameState = initGameState()
     random.shuffle(gameState['cards'])
-    while not gameState['game_over']:
-        playTurn()
+    while running:
+        while gameState['player_turn']:
+            playTurn()
+        while gameState['cpu_turn']:
+            cpuTurn()
+        running = False
     print("McDonalds!")
