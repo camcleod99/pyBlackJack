@@ -1,7 +1,3 @@
-!./pyblackjack/
-!./pyBlackJack/__main__.py
-!gitignore
-!README.MD
-!pyproject.toml
-!LICENSE
-*
+.pytest_cache
+.idea
+poetry.lock
